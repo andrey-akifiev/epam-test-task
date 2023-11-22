@@ -14,12 +14,12 @@ namespace EPAM.StudyGroups.Data.DAL
             this.context = context;
         }
 
-        public async Task<IEnumerable<User>> GetUsers()
+        public async Task<IEnumerable<User>> GetUsers(CancellationToken ctn)
         {
             return await this.context
                 .Users
                 .Include(g => g.StudyGroups)
-                .ToListAsync()
+                .ToListAsync(ctn)
                 .ConfigureAwait(false);
         }
 

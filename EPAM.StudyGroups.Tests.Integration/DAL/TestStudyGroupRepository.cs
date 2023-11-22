@@ -12,7 +12,7 @@ namespace EPAM.StudyGroups.Tests.Integration.DAL
 
         private List<Tuple<int, int>> usersStudyGroups { get; init; } = new();
 
-        public Task CreateStudyGroup(StudyGroup studyGroup)
+        public Task CreateStudyGroup(StudyGroup studyGroup, CancellationToken ctn)
         {
             studyGroup.StudyGroupId = ++this.groupsCounter;
             
@@ -21,26 +21,26 @@ namespace EPAM.StudyGroups.Tests.Integration.DAL
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<StudyGroup>> GetStudyGroups()
+        public Task<IEnumerable<StudyGroup>> GetStudyGroups(CancellationToken ctn)
         {
             return Task.FromResult<IEnumerable<StudyGroup>>(this.studyGroups.Values.ToList());
         }
 
-        public Task JoinStudyGroup(int studyGroupId, int userId)
+        public Task JoinStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             this.usersStudyGroups.Add(new (studyGroupId, userId));
 
             return Task.CompletedTask;
         }
 
-        public Task LeaveStudyGroup(int studyGroupId, int userId)
+        public Task LeaveStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             this.usersStudyGroups.RemoveAll(v => v.Item1 == studyGroupId && v.Item2 == userId);
 
             return Task.CompletedTask;
         }
 
-        public Task<IEnumerable<StudyGroup>> SearchStudyGroups(string subject)
+        public Task<IEnumerable<StudyGroup>> SearchStudyGroups(string subject, CancellationToken ctn)
         {
             return Task.FromResult(
                 this.studyGroups

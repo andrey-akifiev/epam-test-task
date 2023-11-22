@@ -9,7 +9,7 @@ namespace EPAM.StudyGroups.Tests.Integration.DAL
         private int usersCounter = 0;
         private ConcurrentDictionary<int, User> users { get; init; } = new();
 
-        public Task<IEnumerable<User>> GetUsers()
+        public Task<IEnumerable<User>> GetUsers(CancellationToken ctn)
         {
             return Task.FromResult(this.users.Select(u => u.Value));
         }

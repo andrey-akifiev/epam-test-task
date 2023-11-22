@@ -23,7 +23,7 @@ namespace EPAM.StudyGroups.Api.Controllers
         [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> CreateStudyGroup(CreateStudyGroupRequest studyGroup)
+        public async Task<IActionResult> CreateStudyGroup(CreateStudyGroupRequest studyGroup, CancellationToken ctn)
         {
             var newGroup = new StudyGroup
             {
@@ -36,7 +36,7 @@ namespace EPAM.StudyGroups.Api.Controllers
             };
 
             IEnumerable<StudyGroup> groups = await _studyGroupRepository
-                .GetStudyGroups()
+                .GetStudyGroups(ctn)
                 .ConfigureAwait(false);
 
             if (groups.FirstOrDefault(g => g.Name == newGroup.Name) != null)
@@ -51,7 +51,7 @@ namespace EPAM.StudyGroups.Api.Controllers
             }
 
             await _studyGroupRepository
-                .CreateStudyGroup(newGroup)
+                .CreateStudyGroup(newGroup, ctn)
                 .ConfigureAwait(false);
 
             return new OkResult();
@@ -59,10 +59,10 @@ namespace EPAM.StudyGroups.Api.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetStudyGroups()
+        public async Task<IActionResult> GetStudyGroups(CancellationToken ctn)
         {
             var studyGroups = await _studyGroupRepository
-                .GetStudyGroups()
+                .GetStudyGroups(ctn)
                 .ConfigureAwait(false);
 
             return new OkObjectResult(studyGroups);
@@ -70,10 +70,10 @@ namespace EPAM.StudyGroups.Api.Controllers
 
         [HttpGet("search")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> SearchStudyGroups(string subject)
+        public async Task<IActionResult> SearchStudyGroups(string subject, CancellationToken ctn)
         {
             var studyGroups = await _studyGroupRepository
-                .SearchStudyGroups(subject)
+                .SearchStudyGroups(subject, ctn)
                 .ConfigureAwait(false);
 
             return new OkObjectResult(studyGroups);
@@ -82,10 +82,10 @@ namespace EPAM.StudyGroups.Api.Controllers
         [HttpPut("join/{studyGroupId}/{userId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> JoinStudyGroup(int studyGroupId, int userId)
+        public async Task<IActionResult> JoinStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             if (null == (await _studyGroupRepository
-                    .GetStudyGroups()
+                    .GetStudyGroups(ctn)
                     .ConfigureAwait(false))
                     .FirstOrDefault(g => g.StudyGroupId == studyGroupId))
             {
@@ -93,7 +93,7 @@ namespace EPAM.StudyGroups.Api.Controllers
             }
 
             if (null == (await _userRepository
-                    .GetUsers()
+                    .GetUsers(ctn)
                     .ConfigureAwait(false))
                     .FirstOrDefault(u => u.Id == userId))
             {
@@ -101,7 +101,7 @@ namespace EPAM.StudyGroups.Api.Controllers
             }
 
             await _studyGroupRepository
-                .JoinStudyGroup(studyGroupId, userId)
+                .JoinStudyGroup(studyGroupId, userId, ctn)
                 .ConfigureAwait(false);
 
             return new OkResult();
@@ -110,10 +110,10 @@ namespace EPAM.StudyGroups.Api.Controllers
         [HttpPost("leave")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> LeaveStudyGroup(int studyGroupId, int userId)
+        public async Task<IActionResult> LeaveStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             await _studyGroupRepository
-                .LeaveStudyGroup(studyGroupId, userId)
+                .LeaveStudyGroup(studyGroupId, userId, ctn)
                 .ConfigureAwait(false);
 
             return new OkResult();

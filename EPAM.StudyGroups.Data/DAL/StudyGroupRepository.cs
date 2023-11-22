@@ -14,62 +14,63 @@ namespace EPAM.StudyGroups.Data.DAL
             this.context = context;
         }
 
-        public async Task CreateStudyGroup(StudyGroup studyGroup)
+        public async Task CreateStudyGroup(StudyGroup studyGroup, CancellationToken ctn)
         {
             await context
                 .StudyGroups
-                .AddAsync(studyGroup)
+                .AddAsync(studyGroup, ctn)
                 .ConfigureAwait(false);
             await context
-                .SaveChangesAsync()
+                .SaveChangesAsync(ctn)
                 .ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<StudyGroup>> GetStudyGroups()
+        public async Task<IEnumerable<StudyGroup>> GetStudyGroups(CancellationToken ctn)
         {
             return await this.context
                 .StudyGroups
                 .Include(g => g.Users)
-                .ToListAsync()
+                .ToListAsync(ctn)
                 .ConfigureAwait(false);
         }
 
-        public async Task JoinStudyGroup(int studyGroupId, int userId)
+        public async Task JoinStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             (await this.context
                 .StudyGroups
-                .FindAsync(studyGroupId)
+                .FindAsync(studyGroupId, ctn)
                 .ConfigureAwait(false))
                 .AddUser(await this.context
                     .Users
-                    .FindAsync(userId)
+                    .FindAsync(userId, ctn)
                     .ConfigureAwait(false));
             await this.context
-                .SaveChangesAsync()
+                .SaveChangesAsync(ctn)
                 .ConfigureAwait(false);
         }
 
-        public async Task LeaveStudyGroup(int studyGroupId, int userId)
+        public async Task LeaveStudyGroup(int studyGroupId, int userId, CancellationToken ctn)
         {
             (await this.context
                 .StudyGroups
-                .FindAsync(studyGroupId)
+                .FindAsync(studyGroupId, ctn)
                 .ConfigureAwait(false))
                 .RemoveUser(await this.context
                     .Users
-                    .FindAsync(userId)
+                    .FindAsync(userId, ctn)
                     .ConfigureAwait(false));
             await this.context
-                .SaveChangesAsync()
+                .SaveChangesAsync(ctn)
                 .ConfigureAwait(false);
         }
 
-        public async Task<IEnumerable<StudyGroup>> SearchStudyGroups(string subject)
+        public async Task<IEnumerable<StudyGroup>> SearchStudyGroups(string subject, CancellationToken ctn)
         {
             return await this.context
                 .StudyGroups
                 .Where(g => g.Subject == (Subject)Enum.Parse(typeof(Subject), subject))
-                .ToListAsync();
+                .ToListAsync(ctn)
+                .ConfigureAwait(false);
         }
 
         public void Dispose()

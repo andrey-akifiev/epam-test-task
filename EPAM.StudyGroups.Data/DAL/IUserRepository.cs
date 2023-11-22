@@ -4,6 +4,6 @@ namespace EPAM.StudyGroups.Data.DAL
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetUsers();
+        Task<IEnumerable<User>> GetUsers(CancellationToken ctn);
     }
 }
