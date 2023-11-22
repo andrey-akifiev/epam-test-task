@@ -25,10 +25,17 @@ namespace EPAM.StudyGroups.Api.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateStudyGroup(CreateStudyGroupRequest studyGroup)
         {
-            if ((await _studyGroupRepository
+            var groups = await _studyGroupRepository
                 .GetStudyGroups()
-                .ConfigureAwait(false))
-                .FirstOrDefault(g => g.Name == studyGroup.Name) != null)
+                .ConfigureAwait(false);
+
+            if (groups.FirstOrDefault(g => g.Name == studyGroup.Name) != null)
+            {
+                return new ConflictResult();
+            }
+
+            // AC: 1
+            if (groups.FirstOrDefault(g => g.Subject == studyGroup.Subject) != null)
             {
                 return new ConflictResult();
             }
