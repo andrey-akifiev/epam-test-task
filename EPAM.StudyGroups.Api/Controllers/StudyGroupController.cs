@@ -20,34 +20,38 @@ namespace EPAM.StudyGroups.Api.Controllers
             _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         }
 
-        [HttpPost()]
+        [HttpPost("create")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> CreateStudyGroup(CreateStudyGroupRequest studyGroup)
         {
-            var groups = await _studyGroupRepository
+            var newGroup = new StudyGroup
+            {
+                Name = studyGroup.Name,
+                // Part of implementation of AC1b:
+                // The only valid Subjects are: Math, Chemistry, Physics
+                Subject = (Subject)Enum.Parse(typeof(Subject), studyGroup.Subject),
+                // AC1c: We want to record when Study Groups were created
+                CreateDate = DateTime.UtcNow,
+            };
+
+            IEnumerable<StudyGroup> groups = await _studyGroupRepository
                 .GetStudyGroups()
                 .ConfigureAwait(false);
 
-            if (groups.FirstOrDefault(g => g.Name == studyGroup.Name) != null)
+            if (groups.FirstOrDefault(g => g.Name == newGroup.Name) != null)
             {
                 return new ConflictResult();
             }
 
             // AC1: Users are able to create only one Study Group for a single Subject
-            if (groups.FirstOrDefault(g => g.Subject == studyGroup.Subject) != null)
+            if (groups.FirstOrDefault(g => g.Subject == newGroup.Subject) != null)
             {
                 return new ConflictResult();
             }
 
             await _studyGroupRepository
-                .CreateStudyGroup(
-                    new StudyGroup
-                    {
-                        Name = studyGroup.Name,
-                        Subject = studyGroup.Subject,
-                        CreateDate = DateTime.UtcNow,
-                    })
+                .CreateStudyGroup(newGroup)
                 .ConfigureAwait(false);
 
             return new OkResult();
