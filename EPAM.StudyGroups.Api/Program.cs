@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Text.Json.Serialization;
 using System.Text.Json;
+using EPAM.StudyGroups.Api.Extensions;
 
 namespace EPAM.StudyGroups.Api
 {
@@ -24,6 +25,8 @@ namespace EPAM.StudyGroups.Api
             // Add services to the container.
             builder.Services.AddTransient<IStudyGroupRepository, StudyGroupRepository>();
             builder.Services.AddTransient<IUserRepository, UserRepository>();
+
+            builder.Services.AddFluentValidation();
 
             builder
                 .Services

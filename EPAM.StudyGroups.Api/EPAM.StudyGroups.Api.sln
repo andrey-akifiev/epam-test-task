@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAM.StudyGroups.Data", "..
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPAM.StudyGroup.Api.Tests", "..\EPAM.StudyGroup.Api.Tests\EPAM.StudyGroup.Api.Tests.csproj", "{AA7203CC-7DD9-466E-99E2-20CDD8B5A99C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPAM.StudyGroups.Tests.Integration", "..\EPAM.StudyGroups.Tests.Integration\EPAM.StudyGroups.Tests.Integration.csproj", "{82E6B81A-D682-4CD9-9744-968BBA141EA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AA7203CC-7DD9-466E-99E2-20CDD8B5A99C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AA7203CC-7DD9-466E-99E2-20CDD8B5A99C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AA7203CC-7DD9-466E-99E2-20CDD8B5A99C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82E6B81A-D682-4CD9-9744-968BBA141EA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82E6B81A-D682-4CD9-9744-968BBA141EA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82E6B81A-D682-4CD9-9744-968BBA141EA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82E6B81A-D682-4CD9-9744-968BBA141EA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
