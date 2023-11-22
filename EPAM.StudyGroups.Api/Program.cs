@@ -21,6 +21,7 @@ namespace EPAM.StudyGroups.Api
 
             // Add services to the container.
             builder.Services.AddTransient<IStudyGroupRepository, StudyGroupRepository>();
+            builder.Services.AddTransient<IUserRepository, UserRepository>();
 
             builder
                 .Services
