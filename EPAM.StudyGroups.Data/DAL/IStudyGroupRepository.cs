@@ -1,6 +1,6 @@
 ﻿using EPAM.StudyGroups.Data.Models;
 
-namespace EPAM.StudyGroups.Api.Data
+namespace EPAM.StudyGroups.Data.DAL
 {
     public interface IStudyGroupRepository
     {

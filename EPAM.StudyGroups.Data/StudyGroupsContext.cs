@@ -5,10 +5,6 @@ namespace EPAM.StudyGroups.Data
 {
     public class StudyGroupsContext : DbContext
     {
-        public StudyGroupsContext()
-        {
-        }
-
         public StudyGroupsContext(DbContextOptions<StudyGroupsContext> options)
             : base(options)
         {

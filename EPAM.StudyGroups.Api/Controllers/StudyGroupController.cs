@@ -1,4 +1,5 @@
-﻿using EPAM.StudyGroups.Api.Data;
+﻿using EPAM.StudyGroups.Api.Models;
+using EPAM.StudyGroups.Data.DAL;
 using EPAM.StudyGroups.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,23 +17,46 @@ namespace EPAM.StudyGroups.Api.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> CreateStudyGroup(StudyGroup studyGroup)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<IActionResult> CreateStudyGroup(CreateStudyGroupRequest studyGroup)
         {
-            await _studyGroupRepository.CreateStudyGroup(studyGroup);
+            if ((await _studyGroupRepository
+                .GetStudyGroups()
+                .ConfigureAwait(false))
+                .FirstOrDefault(g => g.Name == studyGroup.Name) != null)
+            {
+                return new ConflictResult();
+            }
+
+            await _studyGroupRepository
+                .CreateStudyGroup(
+                    new StudyGroup
+                    {
+                        Name = studyGroup.Name,
+                        Subject = studyGroup.Subject,
+                        CreateDate = DateTime.UtcNow,
+                    })
+                .ConfigureAwait(false);
+
             return new OkResult();
         }
 
         [HttpGet]
         public async Task<IActionResult> GetStudyGroups()
         {
-            var studyGroups = await _studyGroupRepository.GetStudyGroups();
+            var studyGroups = await _studyGroupRepository
+                .GetStudyGroups()
+                .ConfigureAwait(false);
             return new OkObjectResult(studyGroups);
         }
 
         [HttpGet("search")]
         public async Task<IActionResult> SearchStudyGroups(string subject)
         {
-            var studyGroups = await _studyGroupRepository.SearchStudyGroups(subject);
+            var studyGroups = await _studyGroupRepository
+                .SearchStudyGroups(subject)
+                .ConfigureAwait(false);
             return new OkObjectResult(studyGroups);
         }
 

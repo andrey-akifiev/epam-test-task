@@ -17,18 +17,23 @@
         }
 
         //Some logic will be missing to validate values according to acceptance criteria,
-        public int StudyGroupId { get; }
+        public int? StudyGroupId { get; set; }
 
-        public string Name { get; }
+        public string Name { get; set; }
 
-        public Subject Subject { get; }
+        public Subject Subject { get; set; }
 
-        public DateTime CreateDate { get; }
+        public DateTime CreateDate { get; set; }
 
         public List<User> Users { get; private set; }
 
         public void AddUser(User user)
         {
+            if (Users == null)
+            {
+                Users = new List<User>();
+            }
+
             Users.Add(user);
         }
 

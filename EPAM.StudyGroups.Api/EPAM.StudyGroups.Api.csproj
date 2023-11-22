@@ -23,10 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\EPAM.StudyGroups.Data\EPAM.StudyGroups.Data.csproj" />
   </ItemGroup>
 
