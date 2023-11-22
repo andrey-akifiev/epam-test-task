@@ -1,4 +1,4 @@
-﻿namespace EPAM.StudyGroups.Api.Models
+﻿namespace EPAM.StudyGroups.Data.Models
 {
     public enum Subject
     {

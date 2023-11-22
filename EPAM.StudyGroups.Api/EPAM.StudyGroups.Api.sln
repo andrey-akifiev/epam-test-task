@@ -7,8 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPAM.StudyGroups.Api", "EPA
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CA4907A1-0FD9-40C3-8EE4-4BA788F04C6B}"
 	ProjectSection(SolutionItems) = preProject
-		.gitignore = .gitignore
+		..\.gitignore = ..\.gitignore
+		..\README.md = ..\README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPAM.StudyGroups.Data", "..\EPAM.StudyGroups.Data\EPAM.StudyGroups.Data.csproj", "{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +23,10 @@ Global
 		{75ADAF4E-5F8E-4FD5-89EB-9E84BDE9B3DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{75ADAF4E-5F8E-4FD5-89EB-9E84BDE9B3DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{75ADAF4E-5F8E-4FD5-89EB-9E84BDE9B3DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿using EPAM.StudyGroups.Api.Models;
+﻿using EPAM.StudyGroups.Data.Models;
 
 namespace EPAM.StudyGroups.Api.Data
 {

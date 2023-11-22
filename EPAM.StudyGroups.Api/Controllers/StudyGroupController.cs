@@ -1,5 +1,5 @@
 ﻿using EPAM.StudyGroups.Api.Data;
-using EPAM.StudyGroups.Api.Models;
+using EPAM.StudyGroups.Data.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPAM.StudyGroups.Api.Controllers
