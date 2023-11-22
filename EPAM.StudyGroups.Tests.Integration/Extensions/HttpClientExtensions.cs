@@ -1,9 +1,19 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace EPAM.StudyGroups.Tests.Integration.Extensions
 {
     public static class HttpClientExtensions
     {
+        private static JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions();
+
+        static HttpClientExtensions()
+        {
+            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            jsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        }
+
         public static async Task<HttpResponseMessage> PostAsync<TRequest>(
             this HttpClient httpClient,
             string endpointUrl,
@@ -17,6 +27,30 @@ namespace EPAM.StudyGroups.Tests.Integration.Extensions
             return await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
         }
 
+        public static async Task<(TResponse Data, HttpResponseMessage Response)> TryGetAsync<TResponse>(
+            this HttpClient httpClient,
+            string endpointUrl,
+            string correlationId = null)
+            where TResponse : class
+        {
+            TResponse data = null;
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, endpointUrl);
+            requestMessage.Headers.Add(CustomHeaderNames.CorrelationId, correlationId ?? Guid.NewGuid().ToString());
+
+            var response = await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+
+            if (response.IsSuccessStatusCode)
+            {
+                data = await response
+                    .Content
+                    .ReadFromJsonAsync<TResponse>(jsonSerializerOptions)
+                    .ConfigureAwait(false);
+            }
+
+            return (data, response);
+        }
+
         public static async Task<HttpResponseMessage> TryPostAsync<TRequest>(
             this HttpClient httpClient,
             string endpointUrl,
@@ -27,6 +61,7 @@ namespace EPAM.StudyGroups.Tests.Integration.Extensions
 
             return response;
         }
+
         public static async Task<(TResponse Data, HttpResponseMessage Response)> TryPostAsync<TResponse, TRequest>(
             this HttpClient httpClient,
             string endpointUrl,

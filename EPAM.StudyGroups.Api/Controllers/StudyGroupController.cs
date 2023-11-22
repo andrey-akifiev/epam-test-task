@@ -68,7 +68,7 @@ namespace EPAM.StudyGroups.Api.Controllers
             return new OkObjectResult(studyGroups);
         }
 
-        [HttpGet("search")]
+        [HttpGet("{subject}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> SearchStudyGroups(string subject, CancellationToken ctn)
         {
