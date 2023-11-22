@@ -1,3 +1,5 @@
+using EPAM.StudyGroups.Api.Data;
+
 namespace EPAM.StudyGroups.Api
 {
     public class Program
@@ -7,6 +9,7 @@ namespace EPAM.StudyGroups.Api
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddTransient<IStudyGroupRepository, StudyGroupRepository>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
