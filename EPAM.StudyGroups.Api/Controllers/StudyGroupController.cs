@@ -34,7 +34,7 @@ namespace EPAM.StudyGroups.Api.Controllers
                 return new ConflictResult();
             }
 
-            // AC: 1
+            // AC1: Users are able to create only one Study Group for a single Subject
             if (groups.FirstOrDefault(g => g.Subject == studyGroup.Subject) != null)
             {
                 return new ConflictResult();

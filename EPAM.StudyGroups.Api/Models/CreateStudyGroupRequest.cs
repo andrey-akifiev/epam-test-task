@@ -1,13 +1,16 @@
 ﻿using EPAM.StudyGroups.Data.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace EPAM.StudyGroups.Api.Models
 {
     public class CreateStudyGroupRequest
     {
-        public int Id { get; internal set; }
-
+        [Required]
+        [MinLength(5)]
+        [MaxLength(30)]
         public string Name { get; set; }
 
+        [Required]
         public Subject Subject { get; set; }
     }
 }

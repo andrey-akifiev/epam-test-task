@@ -2,6 +2,8 @@ using EPAM.StudyGroups.Data.DAL;
 using EPAM.StudyGroups.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Text.Json.Serialization;
+using System.Text.Json;
 
 namespace EPAM.StudyGroups.Api
 {
@@ -27,8 +29,10 @@ namespace EPAM.StudyGroups.Api
                 .Services
                 .AddControllers()
                 .AddJsonOptions(options =>
-                    options.JsonSerializerOptions.ReferenceHandler = 
-                        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles);
+                    {
+                        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+                    });
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
