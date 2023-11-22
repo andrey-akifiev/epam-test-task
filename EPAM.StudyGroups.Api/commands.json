@@ -1,0 +1,9 @@
+{
+  "commands": {
+    "RecreateDB": {
+      "fileName": "powershell.exe",
+      "workingDirectory": ".",
+      "arguments": "-ExecutionPolicy Bypass -NonInteractive -File Scripts\\RecreateDB.ps1"
+    }
+  }
+}

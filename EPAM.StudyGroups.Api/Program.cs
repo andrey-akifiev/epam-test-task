@@ -1,4 +1,7 @@
 using EPAM.StudyGroups.Api.Data;
+using EPAM.StudyGroups.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace EPAM.StudyGroups.Api
 {
@@ -7,6 +10,14 @@ namespace EPAM.StudyGroups.Api
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            IConfiguration configuration = builder.Configuration;
+            string studyGroupsContextConnString = configuration.GetConnectionString(nameof(StudyGroupsContext));
+            builder.Services.AddDbContext<StudyGroupsContext>(options =>
+            {
+                options.UseSqlServer(studyGroupsContextConnString);
+                options.ConfigureWarnings(warnings => warnings.Ignore(CoreEventId.NavigationBaseIncludeIgnored));
+            });
 
             // Add services to the container.
             builder.Services.AddTransient<IStudyGroupRepository, StudyGroupRepository>();
