@@ -26,8 +26,6 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
                     })
                 .ConfigureAwait(false);
 
-            var repo = testStudyGroupRepository;
-
             // ASSERT
             response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         }
@@ -160,18 +158,27 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
             data.Should()
                 .HaveCount(1)
                 .And
-                .ContainEquivalentOf(
+                .Subject
+                .First()
+                .Should()
+                .BeEquivalentTo(
                     new StudyGroup
                     {
                         Name = expectedName,
                         Subject = expectedSubject,
-                        StudyGroupId = 1,
                         CreateDate = DateTime.UtcNow,
                     }, 
                     config => config
                         .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 15.Seconds()))
                         .WhenTypeIs<DateTime>()
-                        .Excluding(o => o.Users));
+                        .Excluding(o => o.Users)
+                        .Excluding(o => o.StudyGroupId))
+                .And
+                .Subject
+                .As<StudyGroup>()
+                .StudyGroupId
+                .Should()
+                .BeGreaterThan(0);
         }
 
         [Test]
@@ -255,7 +262,8 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
                     config => config
                         .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 15.Seconds()))
                         .WhenTypeIs<DateTime>()
-                        .Excluding(o => o.Users));
+                        .Excluding(o => o.Users)
+                        .Excluding(o => o.StudyGroupId));
         }
 
         [Test]
@@ -299,13 +307,13 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
                     {
                         Name = expectedName,
                         Subject = expectedSubject,
-                        StudyGroupId = 2,
                         CreateDate = DateTime.UtcNow,
                     },
                     config => config
                         .Using<DateTime>(ctx => ctx.Subject.Should().BeCloseTo(ctx.Expectation, 15.Seconds()))
                         .WhenTypeIs<DateTime>()
-                        .Excluding(o => o.Users));
+                        .Excluding(o => o.Users)
+                        .Excluding(o => o.StudyGroupId));
         }
 
         [Test]

@@ -8,7 +8,7 @@ namespace EPAM.StudyGroups.Tests.Integration
 {
     public class StudyGroupsWebAppFactory : WebApplicationFactory<Api.Program>
     {
-        public TestUserRepository TestUserRepository { get; set; }
+        public InMemoryTestUserRepository TestUserRepository { get; set; }
         public TestStudyGroupRepository TestStudyGroupRepository { get; set; }
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -21,7 +21,7 @@ namespace EPAM.StudyGroups.Tests.Integration
                 services.Remove(services.SingleOrDefault(d => d.ServiceType == typeof(IStudyGroupRepository))!);
                 services.AddSingleton(typeof(IStudyGroupRepository), TestStudyGroupRepository);
 
-                TestUserRepository = new TestUserRepository();
+                TestUserRepository = new InMemoryTestUserRepository();
                 services.Remove(services.SingleOrDefault(d => d.ServiceType == typeof(IUserRepository))!);
                 services.AddSingleton(typeof(IUserRepository), TestUserRepository);
             });

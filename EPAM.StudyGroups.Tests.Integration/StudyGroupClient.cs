@@ -9,48 +9,54 @@ namespace EPAM.StudyGroups.Tests.Integration
     {
         private readonly HttpClient httpClient;
 
+        protected StudyGroupClient()
+        {
+        }
+
         public StudyGroupClient(HttpClient httpClient)
         {
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public Task CreateStudyGroupAsync(CreateStudyGroupRequest request, string correlationId = null)
+        public virtual HttpClient Http => this.httpClient;
+
+        public virtual Task CreateStudyGroupAsync(CreateStudyGroupRequest request, string correlationId = null)
         {
             return this.TryCreateStudyGroupAsync(request, correlationId);
         }
 
-        public Task<HttpResponseMessage> TryCreateStudyGroupAsync(
+        public virtual Task<HttpResponseMessage> TryCreateStudyGroupAsync(
             CreateStudyGroupRequest request,
             string correlationId = null)
         {
-            return this.httpClient.TryPostAsync("/studygroup/create", request, correlationId);
+            return this.Http.TryPostAsync("/studygroup/create", request, correlationId);
         }
 
-        public Task<StudyGroup[]> GetStudyGroupsAsync(string correlationId = null)
+        public virtual Task<StudyGroup[]> GetStudyGroupsAsync(string correlationId = null)
         {
             return FromTryMethodAsync<StudyGroup[]>(new(() => this.TryGetStudyGroupsAsync(correlationId)));
         }
 
-        public Task<(StudyGroup[] data, HttpResponseMessage response)> TryGetStudyGroupsAsync(string correlationId = null)
+        public virtual Task<(StudyGroup[] data, HttpResponseMessage response)> TryGetStudyGroupsAsync(string correlationId = null)
         {
-            return this.httpClient.TryGetAsync<StudyGroup[]>("/studygroup", correlationId);
+            return this.Http.TryGetAsync<StudyGroup[]>("/studygroup", correlationId);
         }
 
-        public Task<StudyGroup[]> SearchStudyGroupsAsync(
+        public virtual Task<StudyGroup[]> SearchStudyGroupsAsync(
             string subject,
             string correlationId = null)
         {
             return FromTryMethodAsync<StudyGroup[]>(new(() => this.TrySearchStudyGroupsAsync(subject, correlationId)));
         }
 
-        public Task<(StudyGroup[] data, HttpResponseMessage response)> TrySearchStudyGroupsAsync(
+        public virtual Task<(StudyGroup[] data, HttpResponseMessage response)> TrySearchStudyGroupsAsync(
             string subject,
             string correlationId = null)
         {
-            return this.httpClient.TryGetAsync<StudyGroup[]>($"/studygroup/search?{nameof(subject)}={subject}", correlationId);
+            return this.Http.TryGetAsync<StudyGroup[]>($"/studygroup/search?{nameof(subject)}={subject}", correlationId);
         }
 
-        public Task JoinStudyGroupAsync(
+        public virtual Task JoinStudyGroupAsync(
             int studyGroupId,
             int userId,
             string correlationId = null)
@@ -58,16 +64,16 @@ namespace EPAM.StudyGroups.Tests.Integration
             return this.TryJoinStudyGroupAsync(studyGroupId.ToString(), userId.ToString(), correlationId);
         }
 
-        public Task<HttpResponseMessage> TryJoinStudyGroupAsync(
+        public virtual Task<HttpResponseMessage> TryJoinStudyGroupAsync(
             string studyGroupId,
             string userId,
             string correlationId = null)
         {
-            return this.httpClient.TryPutAsync<object>(
+            return this.Http.TryPutAsync<object>(
                 $"/studygroup/join?{nameof(studyGroupId)}={studyGroupId}&{nameof(userId)}={userId}", correlationId: correlationId);
         }
 
-        public Task LeaveStudyGroupAsync(
+        public virtual Task LeaveStudyGroupAsync(
             int studyGroupId,
             int userId,
             string correlationId = null)
@@ -75,24 +81,25 @@ namespace EPAM.StudyGroups.Tests.Integration
             return this.TryLeaveStudyGroupAsync(studyGroupId.ToString(), userId.ToString(), correlationId);
         }
 
-        public Task<HttpResponseMessage> TryLeaveStudyGroupAsync(
+        public virtual Task<HttpResponseMessage> TryLeaveStudyGroupAsync(
             string studyGroupId,
             string userId,
             string correlationId = null)
         {
-            return this.httpClient.TryPutAsync<object>(
+            return this.Http.TryPutAsync<object>(
                 $"/studygroup/leave?{nameof(studyGroupId)}={studyGroupId}&{nameof(userId)}={userId}", correlationId);
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
-            this.httpClient?.Dispose();
+            this.Http?.Dispose();
         }
 
         private async Task<TResponse> FromTryMethodAsync<TResponse>(Func<Task<(TResponse, HttpResponseMessage)>> func)
         {
             (var data, var response) = await func().ConfigureAwait(false);
 
+            response.IsSuccessStatusCode.Should().BeTrue(response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
             data.Should().NotBeNull(response.Content.ReadAsStringAsync().GetAwaiter().GetResult());
 
             return data;

@@ -38,11 +38,11 @@ namespace EPAM.StudyGroups.Data.DAL
         {
             (await this.context
                 .StudyGroups
-                .FindAsync(studyGroupId, ctn)
+                .FindAsync(new object[] { studyGroupId }, cancellationToken: ctn)
                 .ConfigureAwait(false))
                 .AddUser(await this.context
                     .Users
-                    .FindAsync(userId, ctn)
+                    .FindAsync(new object[] { userId }, cancellationToken: ctn)
                     .ConfigureAwait(false));
             await this.context
                 .SaveChangesAsync(ctn)
@@ -53,11 +53,11 @@ namespace EPAM.StudyGroups.Data.DAL
         {
             (await this.context
                 .StudyGroups
-                .FindAsync(studyGroupId, ctn)
+                .FindAsync(new object[] { studyGroupId }, cancellationToken: ctn)
                 .ConfigureAwait(false))
                 .RemoveUser(await this.context
                     .Users
-                    .FindAsync(userId, ctn)
+                    .FindAsync(new object[] { userId }, cancellationToken: ctn)
                     .ConfigureAwait(false));
             await this.context
                 .SaveChangesAsync(ctn)

@@ -1,10 +1,9 @@
-﻿using EPAM.StudyGroups.Data.DAL;
-using EPAM.StudyGroups.Data.Models;
+﻿using EPAM.StudyGroups.Data.Models;
 using System.Collections.Concurrent;
 
 namespace EPAM.StudyGroups.Tests.Integration.DAL
 {
-    public class TestUserRepository : IUserRepository
+    public class InMemoryTestUserRepository : ITestUserRepository
     {
         private int usersCounter = 0;
         private ConcurrentDictionary<int, User> users { get; init; } = new();

@@ -1,0 +1,9 @@
+﻿<RunSettings>
+  <RunConfiguration>
+    <EnvironmentVariables>
+      <!-- List of environment variables we want to set-->
+	  <ASPNETCORE_ENVIRONMENT>Development</ASPNETCORE_ENVIRONMENT>
+      <TEST_ENVIRONMENT>InMemory</TEST_ENVIRONMENT>
+    </EnvironmentVariables>
+  </RunConfiguration>
+</RunSettings>
