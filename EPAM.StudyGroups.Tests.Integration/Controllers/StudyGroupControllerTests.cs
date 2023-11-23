@@ -307,5 +307,11 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
                         .WhenTypeIs<DateTime>()
                         .Excluding(o => o.Users));
         }
+
+        [Test]
+        public async Task JoinStudyGroup()
+        {
+
+        }
     }
 }

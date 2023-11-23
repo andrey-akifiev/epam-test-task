@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace EPAM.StudyGroups.Api.Validators
 {
-    public class CreateStudyGroupRequestValidator : AbstractValidator<CreateStudyGroupRequest>
+    public class CreateStudyGroupRequestValidator : BaseValidator<CreateStudyGroupRequest>
     {
         public CreateStudyGroupRequestValidator()
         {
@@ -21,16 +21,6 @@ namespace EPAM.StudyGroups.Api.Validators
                 .Must(BeOneOfEnumValues)
                 .WithMessage(
                     $"Specified {nameof(CreateStudyGroupRequest.Subject)} should be one of the following values: '{string.Join(',', this.GetAllValuesOfSubjectEnum())}'.");
-        }
-
-        private bool BeOneOfEnumValues(string subject)
-        {
-            return GetAllValuesOfSubjectEnum().Contains(subject);
-        }
-
-        private string[] GetAllValuesOfSubjectEnum()
-        {
-            return Enum.GetNames(typeof(Subject));
         }
     }
 }
