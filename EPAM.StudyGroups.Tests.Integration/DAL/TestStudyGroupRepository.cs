@@ -30,6 +30,8 @@ namespace EPAM.StudyGroups.Tests.Integration.DAL
         {
             this.usersStudyGroups.Add(new (studyGroupId, userId));
 
+            this.studyGroups[studyGroupId].AddUser(new User { Id = userId });
+
             return Task.CompletedTask;
         }
 

@@ -40,14 +40,48 @@ namespace EPAM.StudyGroups.Tests.Integration
             string subject,
             string correlationId = null)
         {
-            return FromTryMethodAsync<StudyGroup[]>(new(() => this.TrySearchStudyGroupsAsync(correlationId)));
+            return FromTryMethodAsync<StudyGroup[]>(new(() => this.TrySearchStudyGroupsAsync(subject, correlationId)));
         }
 
         public Task<(StudyGroup[] data, HttpResponseMessage response)> TrySearchStudyGroupsAsync(
             string subject,
             string correlationId = null)
         {
-            return this.httpClient.TryGetAsync<StudyGroup[]>($"/studygroup/{subject}", correlationId);
+            return this.httpClient.TryGetAsync<StudyGroup[]>($"/studygroup/search?{nameof(subject)}={subject}", correlationId);
+        }
+
+        public Task JoinStudyGroupAsync(
+            int studyGroupId,
+            int userId,
+            string correlationId = null)
+        {
+            return this.TryJoinStudyGroupAsync(studyGroupId.ToString(), userId.ToString(), correlationId);
+        }
+
+        public Task<HttpResponseMessage> TryJoinStudyGroupAsync(
+            string studyGroupId,
+            string userId,
+            string correlationId = null)
+        {
+            return this.httpClient.TryPutAsync<object>(
+                $"/studygroup/join?{nameof(studyGroupId)}={studyGroupId}&{nameof(userId)}={userId}", correlationId: correlationId);
+        }
+
+        public Task LeaveStudyGroupAsync(
+            int studyGroupId,
+            int userId,
+            string correlationId = null)
+        {
+            return this.TryLeaveStudyGroupAsync(studyGroupId.ToString(), userId.ToString(), correlationId);
+        }
+
+        public Task<HttpResponseMessage> TryLeaveStudyGroupAsync(
+            string studyGroupId,
+            string userId,
+            string correlationId = null)
+        {
+            return this.httpClient.TryPutAsync<object>(
+                $"/studygroup/leave?{nameof(studyGroupId)}={studyGroupId}&{nameof(userId)}={userId}", correlationId);
         }
 
         public void Dispose()

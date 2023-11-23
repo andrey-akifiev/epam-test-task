@@ -27,6 +27,24 @@ namespace EPAM.StudyGroups.Tests.Integration.Extensions
             return await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
         }
 
+        public static async Task<HttpResponseMessage> PutAsync<TRequest>(
+            this HttpClient httpClient,
+            string endpointUrl,
+            TRequest payload = null,
+            string correlationId = null)
+                where TRequest : class
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, endpointUrl);
+            requestMessage.Headers.Add(CustomHeaderNames.CorrelationId, correlationId ?? Guid.NewGuid().ToString());
+
+            if (payload != null)
+            {
+                requestMessage.Content = JsonContent.Create(payload);
+            }
+
+            return await httpClient.SendAsync(requestMessage).ConfigureAwait(false);
+        }
+
         public static async Task<(TResponse Data, HttpResponseMessage Response)> TryGetAsync<TResponse>(
             this HttpClient httpClient,
             string endpointUrl,
@@ -79,6 +97,18 @@ namespace EPAM.StudyGroups.Tests.Integration.Extensions
             }
 
             return (data, response);
+        }
+
+        public static async Task<HttpResponseMessage> TryPutAsync<TRequest>(
+            this HttpClient httpClient,
+            string endpointUrl,
+            TRequest payload = null,
+            string correlationId = null)
+                where TRequest : class
+        {
+            var response = await httpClient.PutAsync(endpointUrl, payload, correlationId).ConfigureAwait(false);
+
+            return response;
         }
     }
 }

@@ -309,9 +309,380 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
         }
 
         [Test]
-        public async Task JoinStudyGroup()
+        public async Task JoinStudyGroup_ShouldReturnBadRequest_WhenStudyGroupAndUserIdAreEmpty()
         {
+            // ARRANGE
+            using var client = this.GetStudyGroupClient();
 
+            // ACT
+            HttpResponseMessage response = await client
+                .TryJoinStudyGroupAsync(
+                    studyGroupId: string.Empty,
+                    userId: string.Empty)
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        public async Task JoinStudyGroup_ShouldReturnNotFound_WhenStudyGroupWithSpecifiedIdDoesNotExist()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            using var client = this.GetStudyGroupClient();
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryJoinStudyGroupAsync(
+                    studyGroupId: 
+                        int.MaxValue.ToString(),
+                    userId:
+                        (await TestUserRepository
+                            .GetUsers(CancellationToken.None)
+                            .ConfigureAwait(false))
+                            .First(u => u.Email == expectedUser.Email)
+                            .Id
+                            .ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task JoinStudyGroup_ShouldReturnNotFound_WhenUserWithSpecifiedIdDoesNotExist()
+        {
+            // ARRANGE
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryJoinStudyGroupAsync(
+                    studyGroupId:
+                        (await client
+                            .GetStudyGroupsAsync()
+                            .ConfigureAwait(false))
+                            .First(g => g.Name == expectedGroupName)
+                            .StudyGroupId
+                            .ToString(),
+                    userId:
+                        int.MaxValue.ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task JoinStudyGroup_ShouldReturnOK_WhenUserAndStudyGroupAreValid()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryJoinStudyGroupAsync(
+                    studyGroupId:
+                        (await client
+                            .GetStudyGroupsAsync()
+                            .ConfigureAwait(false))
+                            .First(g => g.Name == expectedGroupName)
+                            .StudyGroupId
+                            .ToString(),
+                    userId:
+                        (await TestUserRepository
+                            .GetUsers(CancellationToken.None)
+                            .ConfigureAwait(false))
+                            .First(u => u.Email == expectedUser.Email)
+                            .Id
+                            .ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task JoinStudyGroup_ShouldReturnConflict_WhenAlreadyJoined()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            int expectedStudyGroupId =
+                (await client
+                    .GetStudyGroupsAsync()
+                    .ConfigureAwait(false))
+                    .First(g => g.Name == expectedGroupName)
+                    .StudyGroupId
+                    .Value;
+            int expectedUserId =
+                (await TestUserRepository
+                    .GetUsers(CancellationToken.None)
+                    .ConfigureAwait(false))
+                    .First(u => u.Email == expectedUser.Email)
+                    .Id;
+            await client
+                .JoinStudyGroupAsync(
+                    studyGroupId: expectedStudyGroupId,
+                    userId: expectedUserId)
+                .ConfigureAwait(false);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryJoinStudyGroupAsync(
+                    studyGroupId: expectedStudyGroupId.ToString(),
+                    userId: expectedUserId.ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Conflict);
+        }
+
+        [Test]
+        public async Task LeaveStudyGroup_ShouldReturnBadRequest_WhenStudyGroupAndUserIdAreEmpty()
+        {
+            // ARRANGE
+            using var client = this.GetStudyGroupClient();
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryLeaveStudyGroupAsync(
+                    studyGroupId: string.Empty,
+                    userId: string.Empty)
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.BadRequest);
+        }
+
+        [Test]
+        public async Task LeaveStudyGroup_ShouldReturnNotFound_WhenStudyGroupWithSpecifiedIdDoesNotExist()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            using var client = this.GetStudyGroupClient();
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryLeaveStudyGroupAsync(
+                    studyGroupId:
+                        int.MaxValue.ToString(),
+                    userId:
+                        (await TestUserRepository
+                            .GetUsers(CancellationToken.None)
+                            .ConfigureAwait(false))
+                            .First(u => u.Email == expectedUser.Email)
+                            .Id
+                            .ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task LeaveStudyGroup_ShouldReturnNotFound_WhenUserWithSpecifiedIdDoesNotExist()
+        {
+            // ARRANGE
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryLeaveStudyGroupAsync(
+                    studyGroupId:
+                        (await client
+                            .GetStudyGroupsAsync()
+                            .ConfigureAwait(false))
+                            .First(g => g.Name == expectedGroupName)
+                            .StudyGroupId
+                            .ToString(),
+                    userId:
+                        int.MaxValue.ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+        }
+
+        [Test]
+        public async Task LeaveStudyGroup_ShouldReturnOK_WhenUserAndStudyGroupAreValid()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            int expectedStudyGroupId = 
+                (await client
+                    .GetStudyGroupsAsync()
+                    .ConfigureAwait(false))
+                    .First(g => g.Name == expectedGroupName)
+                    .StudyGroupId
+                    .Value;
+            int expectedUserId =
+                (await TestUserRepository
+                    .GetUsers(CancellationToken.None)
+                    .ConfigureAwait(false))
+                    .First(u => u.Email == expectedUser.Email)
+                    .Id;
+
+            await client
+                .JoinStudyGroupAsync(
+                    studyGroupId: expectedStudyGroupId,
+                    userId: expectedUserId)
+                .ConfigureAwait(false);
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryLeaveStudyGroupAsync(
+                    studyGroupId: expectedStudyGroupId.ToString(),
+                    userId: expectedUserId.ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        }
+
+        [Test]
+        public async Task LeaveStudyGroup_ShouldReturnNotFound_WhenUserHasNotJoinedStudyGroup()
+        {
+            // ARRANGE
+            var expectedUser = new User
+            {
+                Email = $"{GetRandomName()}@test.com",
+                FirstName = GetRandomName(),
+                LastName = GetRandomName(),
+            };
+
+            string expectedGroupName = GetRandomName();
+
+            using var client = this.GetStudyGroupClient();
+            await client
+                .CreateStudyGroupAsync(
+                    new CreateStudyGroupRequest()
+                    {
+                        Name = expectedGroupName,
+                        Subject = Subject.Chemistry.ToString(),
+                    })
+                .ConfigureAwait(false);
+
+            this.TestUserRepository.AddUser(expectedUser);
+
+            int expectedStudyGroupId =
+                (await client
+                    .GetStudyGroupsAsync()
+                    .ConfigureAwait(false))
+                    .First(g => g.Name == expectedGroupName)
+                    .StudyGroupId
+                    .Value;
+            int expectedUserId =
+                (await TestUserRepository
+                    .GetUsers(CancellationToken.None)
+                    .ConfigureAwait(false))
+                    .First(u => u.Email == expectedUser.Email)
+                    .Id;
+
+            // ACT
+            HttpResponseMessage response = await client
+                .TryLeaveStudyGroupAsync(
+                    studyGroupId: expectedStudyGroupId.ToString(),
+                    userId: expectedUserId.ToString())
+                .ConfigureAwait(false);
+
+            // ASSERT
+            response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
         }
     }
 }
