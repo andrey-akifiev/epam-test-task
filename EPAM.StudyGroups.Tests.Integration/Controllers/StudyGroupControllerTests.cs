@@ -1,5 +1,6 @@
 ﻿using EPAM.StudyGroups.Api.Models;
 using EPAM.StudyGroups.Data.Models;
+using EPAM.StudyGroups.Tests.Integration.Models;
 using FluentAssertions;
 using FluentAssertions.Extensions;
 using NUnit.Framework;
@@ -119,7 +120,7 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
             using var client = this.GetStudyGroupClient();
 
             // ACT
-            (StudyGroup[] data, HttpResponseMessage response) = await client
+            (TestStudyGroup[] data, HttpResponseMessage response) = await client
                 .TryGetStudyGroupsAsync()
                 .ConfigureAwait(false);
 
@@ -148,7 +149,7 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
                 .ConfigureAwait(false);
 
             // ACT
-            (StudyGroup[] data, HttpResponseMessage response) = await client
+            (TestStudyGroup[] data, HttpResponseMessage response) = await client
                 .TryGetStudyGroupsAsync()
                 .ConfigureAwait(false);
 

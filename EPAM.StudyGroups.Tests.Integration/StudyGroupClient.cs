@@ -1,6 +1,7 @@
 ﻿using EPAM.StudyGroups.Api.Models;
 using EPAM.StudyGroups.Data.Models;
 using EPAM.StudyGroups.Tests.Integration.Extensions;
+using EPAM.StudyGroups.Tests.Integration.Models;
 using FluentAssertions;
 
 namespace EPAM.StudyGroups.Tests.Integration
@@ -32,14 +33,14 @@ namespace EPAM.StudyGroups.Tests.Integration
             return this.Http.TryPostAsync("/studygroup/create", request, correlationId);
         }
 
-        public virtual Task<StudyGroup[]> GetStudyGroupsAsync(string correlationId = null)
+        public virtual Task<TestStudyGroup[]> GetStudyGroupsAsync(string correlationId = null)
         {
-            return FromTryMethodAsync<StudyGroup[]>(new(() => this.TryGetStudyGroupsAsync(correlationId)));
+            return FromTryMethodAsync<TestStudyGroup[]>(new(() => this.TryGetStudyGroupsAsync(correlationId)));
         }
 
-        public virtual Task<(StudyGroup[] data, HttpResponseMessage response)> TryGetStudyGroupsAsync(string correlationId = null)
+        public virtual Task<(TestStudyGroup[] data, HttpResponseMessage response)> TryGetStudyGroupsAsync(string correlationId = null)
         {
-            return this.Http.TryGetAsync<StudyGroup[]>("/studygroup", correlationId);
+            return this.Http.TryGetAsync<TestStudyGroup[]>("/studygroup", correlationId);
         }
 
         public virtual Task<StudyGroup[]> SearchStudyGroupsAsync(
