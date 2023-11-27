@@ -349,7 +349,10 @@ namespace EPAM.StudyGroups.Api.Validators
 }
 ```
 Of cause, this code should be tested as well as everything else. So I'd to create a set of unit tests for the validator. According to the task I used [NUnit](https://nunit.org/) to do that.
-```csharp
+<details>
+<summary>CreateStudyGroupRequestValidatorTests.cs</summary>
+
+```csharp CreateStudyGroupRequestValidatorTests.cs
 namespace EPAM.StudyGroup.Api.Tests.Validators
 {
     public class CreateStudyGroupRequestValidatorTests
@@ -463,6 +466,8 @@ namespace EPAM.StudyGroup.Api.Tests.Validators
     }
 }
 ```
+</details>
+
 `StudyGroupController` also has been changed to reflect the requirements. `CreateStudyGroup` got a new route - `studygroups\create`, it should return `HTTP409Conflict` in case if the specified name or subject is already occupied. And it also has some trivial mapping from DTO used as an external contract to POCO used as a contract of the repo and storage.
 ```csharp
 namespace EPAM.StudyGroups.Api.Controllers
@@ -615,7 +620,11 @@ namespace EPAM.StudyGroups.Tests.Integration
 }
 ```
 As you can see, I've created two different methods to do the same job: `CreateStudyGroupAsync` and `TryCreateStudyGroupAsync`. The first one has been supposed to be used only for positive scenarios when I don't care about the exact value returned from the SUT, I only want to ensure that remote call has been executed successfully. The second method is for the opposite cases - when I want to know everything about the particular response, what is useful for negative testing. It could sound to you as [Try/Can pattern](https://startbigthinksmall.wordpress.com/2011/05/12/the-trycan-pattern/) also known as [TryParse pattern](https://blog.ploeh.dk/2019/07/15/tester-doer-isomorphisms/), but generally it should just return Tuple of several objects if execution is completed in the same way as it works in more functional languages like [JS](https://www.javascripttutorial.net/javascript-return-multiple-values/) or [Golang](https://gobyexample.com/multiple-return-values). Later, you'll see how I use it. Now let's take a look on integration tests for the very first endpoint of StudyGroup controller.
-```csharp StudyGroupControllerTests .cs
+
+<details>
+<summary>StudyGroupControllerTests.cs</summary>
+
+```csharp StudyGroupControllerTests.cs
 namespace EPAM.StudyGroups.Tests.Integration.Controllers
 {
     public class StudyGroupControllerTests : BaseControllerTests
@@ -728,11 +737,17 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
     }
 }
 ```
+</details>
+
 Here I used the same [AAA-pattern](https://medium.com/@pjbgf/title-testing-code-ocd-and-the-aaa-pattern-df453975ab80) well known in unit-testing. Names for tests are written following `MethodName_ExpectedBehavior_StateUnderTest` convention. Both negative and positive scenarios are combined in the same file representing tests for `StudyGroupController`.
 
 ## TDD for the rest of actions
 TODO: Write some intro
-```csharp
+
+<details>
+<summary>Changes made in StudyGroupControllerTests.cs</summary>
+
+```csharp StudyGroupControllerTests.cs
 namespace EPAM.StudyGroups.Tests.Integration.Controllers
 {
     public class StudyGroupControllerTests : BaseControllerTests
@@ -935,7 +950,10 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
     }
 }
 ```
+</details>
+
 These tests forced me [to change](https://github.com/andrey-akifiev/epam-test-task/commit/1a96ee32c83951bf9b9c26133643c5acaaed6463) the extarnal contract. At first to be able to implement validations for these actions. With `FluentValidation` it's not possible to write validation against primitive type like `int` or `string`, so developer has to wrap parameters with a specific type. Below you can find such a wrapper used for `studygroups/search` endpoint.
+
 ```csharp SearchStudyGroupsRequest.cs
 namespace EPAM.StudyGroups.Api.Models
 {
@@ -946,7 +964,9 @@ namespace EPAM.StudyGroups.Api.Models
     }
 }
 ```
+
 Validator looks quite simple as well:
+
 ```csharp
 namespace EPAM.StudyGroups.Api.Validators
 {
@@ -965,7 +985,9 @@ namespace EPAM.StudyGroups.Api.Validators
     }
 }
 ```
+
 Again covered with unit tests:
+
 ```csharp SearchStudyGroupsRequestValidatorTests.cs
 namespace EPAM.StudyGroup.Api.Tests.Validators
 {
@@ -1023,7 +1045,9 @@ namespace EPAM.StudyGroup.Api.Tests.Validators
     }
 }
 ```
+
 After all I had to change the controller:
+
 ```diff
  namespace EPAM.StudyGroups.Api.Controllers
  {
@@ -1048,6 +1072,7 @@ After all I had to change the controller:
      }
  }
 ```
+
 You can check integration tests for join/leave features [here](https://github.com/andrey-akifiev/epam-test-task/commit/1f7a5a52d59cbd939f53b117900b90aed0cf5d7d), it's also display how the product code has been changed regarding new tests.
 
 ## Magical instrumentation: one test code for all environments
@@ -1102,6 +1127,10 @@ Finally, I had to [introduce an option to run integration tests against real env
 ```
 
 ### Decorator for StudyGroupClient
+
+
+<details>
+<summary>StudyGroupPersistenceClient.cs</summary>
 
 ```csharp StudyGroupPersistenceClient.cs
 namespace EPAM.StudyGroups.Tests.Integration
@@ -1205,6 +1234,8 @@ namespace EPAM.StudyGroups.Tests.Integration
     }
 }
 ```
+
+</details>
 
 ### Factories for different environments
 
@@ -1419,6 +1450,10 @@ Scenario: User should be able to re-join the study group
 	 And the list of study groups 'contains new group'
 	 And the 'new' study group contains 'new' user
 ```
+
+
+<details>
+<summary>StudyGroupStepDefinitions.cs</summary>
 
 ```csharp
 namespace EPAM.StudyGroups.Tests.SpecFlow.StepDefinitions
@@ -1813,6 +1848,7 @@ namespace EPAM.StudyGroups.Tests.SpecFlow.StepDefinitions
     }
 }
 ```
+</details>
 
 ## NFR and Load/Performance testing
 
