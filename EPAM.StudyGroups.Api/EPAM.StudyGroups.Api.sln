@@ -9,6 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		..\.gitignore = ..\.gitignore
 		..\README.md = ..\README.md
+		..\Test task.pdf = ..\Test task.pdf
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAM.StudyGroups.Data", "..\EPAM.StudyGroups.Data\EPAM.StudyGroups.Data.csproj", "{6983981C-7EA4-43C0-9CE9-F58F1A1D2F13}"
@@ -19,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAM.StudyGroups.Tests.Inte
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAM.StudyGroups.Tests.SpecFlow", "..\EPAM.StudyGroups.Tests.SpecFlow\EPAM.StudyGroups.Tests.SpecFlow.csproj", "{45606D68-8D5C-40DC-8748-1DC3F72F1E54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPAM.StudyGroups.Tests.Performance", "..\EPAM.StudyGroups.Tests.Performance\EPAM.StudyGroups.Tests.Performance.csproj", "{8E1FB203-3ED6-47D5-A161-1ED87624804B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EPAM.StudyGroups.Tests.Performance", "..\EPAM.StudyGroups.Tests.Performance\EPAM.StudyGroups.Tests.Performance.csproj", "{8E1FB203-3ED6-47D5-A161-1ED87624804B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
