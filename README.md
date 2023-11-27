@@ -1078,8 +1078,107 @@ You can check integration tests for join/leave features [here](https://github.co
 ## Magical instrumentation: one test code for all environments
 
 Finally, I had to [introduce an option to run integration tests against real environment](https://github.com/andrey-akifiev/epam-test-task/commit/b05099b970a97d11c0cc1d852166bc350de1557f).
+Here I’d like to quote the whole chapter from [The Art of Unit Testing Second Edition with examples in C#](https://www.manning.com/books/the-art-of-unit-testing-second-edition) by [Roy Osherove](https://osherove.com/), because it’s very important to understand the way of thinking in this approach.
+
+> **1.1 Defining unit testing, step by step**
+>
+>Unit testing isn’t a new concept in software development. It’s been floating around since the early days of the Smalltalk programming language in the 1970s, and it proves itself time and time again as one of the best ways a developer can improve code quality while gaining a deeper understanding of the functional requirements of a class or method. Kent Beck introduced the concept of unit testing in Smalltalk, and it has carried on into many other programming languages, making unit testing an extremely useful practice in software programming. Before I go any further, I need to define unit testing better. Here’s the classic definition, from Wikipedia. It’ll be slowly evolving throughout this chapter, with the final definition appearing in section 1.4.
+>
+> **DEFINITION 1.0** A unit test is a piece of a code (usually a method) that invokes another piece of code and checks the correctness of some assumptions afterward. If the assumptions turn out to be wrong, the unit test has failed. A unit is a method or function.
+>
+> The thing you’ll write tests for is called the system under test (SUT).
+>
+> **DEFINITION** SUT stands for system under test, and some people like to use CUT (class under test or code under test). When you test something, you refer to the thing you’re testing as the SUT.
+>
+> I used to feel (Yes, feel. There is no science in this book. Just art.) this definition of a unit test was technically correct, but over the past couple of years, my idea of what a unit is has changed. To me, a unit stands for “unit of work” or a “use case” inside the system.
+>
+> **Definition**
+> A unit of work is the sum of actions that take place between the invocation of a public method in the system and a single noticeable end result by a test of that system. A noticeable end result can be observed without looking at the internal state of the system and only through its public APIs and behavior. An end result is any of the following:
+> 1. The invoked public method returns a value (a function that’s not void).
+> 2. There’s a noticeable change to the state or behavior of the system before and after invocation that can be determined without interrogating private state. (Examples: the system can log in a previously nonexistent user, or the system’s properties change if the system is a state machine.)
+> 3. There’s a callout to a third-party system over which the test has no control, and that third-party system doesn’t return any value, or any return value from that system is ignored. (Example: calling a third-party logging system that was not written by you and you don’t have the source to.)
+>
+> This idea of a unit of work means, to me, that a unit can span as little as a single method and up to multiple classes and functions to achieve its purpose. 
+> You might feel that you’d like to minimize the size of a unit of work being tested. I used to feel that way. But I don’t anymore. I believe if you can create a unit of work that’s larger, and where its end result is more noticeable to an end user of the API, you’re creating tests that are more maintainable. If you try to minimize the size of a unit of work, you end up faking things down the line that aren’t really end results to the user of a public API but instead are just train stops on the way to the main station. I explain more on this in the topic of overspecification later in this book (mostly in chapter 8).
+>
+> **UPDATED DEFINITION 1.1** A unit test is a piece of code that invokes a unit of work and checks one specific end result of that unit of work. If the assumptions on the end result turn out to be wrong, the unit test has failed. A unit test’s scope can span as little as a method or as much as multiple classes.
+>
+> No matter what programming language you’re using, one of the most difficult aspects of defining a unit test is defining what’s meant by a “good” one.
+
+And one more quote, small one this time, from the chapter 1.3 Integration tests
+
+> **DEFINITION** Integration testing is testing a unit of work without having full control over all of it and using one or more of its real dependencies, such as time, network, database, threads, random number generators, and so on.
+> To summarize: an integration test uses real dependencies; unit tests isolate the unit of work from its dependencies so that they’re easily consistent in their results and can easily control and simulate any aspect of the unit’s behavior.
+
+Basically we just discussed the key part of our back-end testing. In short, the only difference between unit and integration testing is isolation when someone tries to write tests from end-user perspective.
+
+Now it’s time to figure out how to do it in .NET world.
+
+<details>
+<summary>Testing in ASP.NET Core</summary>
+According to [Microsoft’s documentation](https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-7.0):
+
+> **Introduction to integration tests**
+> Integration tests evaluate an app's components on a broader level than unit tests. Unit tests are used to test isolated software components, such as individual class methods. Integration tests confirm that two or more app components work together to produce an expected result, possibly including every component required to fully process a request.
+> These broader tests are used to test the app's infrastructure and whole framework, often including the following components:
+> - Database
+> - File system
+> - Network appliances
+> - Request-response pipeline
+> 
+> Unit tests use fabricated components, known as fakes or mock objects, in place of infrastructure components.
+> 
+> In contrast to unit tests, integration tests:
+> - Use the actual components that the app uses in production.
+> - Require more code and data processing.
+> - Take longer to run.
+> 
+> Therefore, limit the use of integration tests to the most important infrastructure scenarios. If a behavior can be tested using either a unit test or an integration test, choose the unit test.
+>
+> In discussions of integration tests, the tested project is frequently called the System Under Test, or "SUT" for short. "SUT" is used throughout this article to refer to the ASP.NET  Core app being tested.
+> Don't write integration tests for every permutation of data and file access with databases and file systems. Regardless of how many places across an app interact with databases and file systems, a focused set of read, write, update, and delete integration tests are usually capable of adequately testing database and file system components. Use unit tests for routine tests of method logic that interact with these components. In unit tests, the use of infrastructure fakes or mocks result in faster test execution.
+>
+> **ASP.NET Core integration tests**
+>
+> Integration tests in ASP.NET Core require the following:
+> - A test project is used to contain and execute the tests. The test project has a reference to the SUT.
+> - The test project creates a test web host for the SUT and uses a test server client to handle requests and responses with the SUT.
+> - A test runner is used to execute the tests and report the test results.
+>
+> Integration tests follow a sequence of events that include the usual Arrange, Act, and Assert test steps:
+> 1. The SUT's web host is configured.
+> 2. A test server client is created to submit requests to the app.
+> 3. The Arrange test step is executed: The test app prepares a request.
+> 4. The Act test step is executed: The client submits the request and receives the response.
+> 5. The Assert test step is executed: The actual response is validated as a pass or fail based on an expected response.
+> 6. The process continues until all of the tests are executed.
+> 7. The test results are reported.
+>
+> Usually, the test web host is configured differently than the app's normal web host for the test runs. For example, a different database or different app settings might be used for the tests.
+>
+> Infrastructure components, such as the test web host and in-memory test server (TestServer), are provided or managed by the Microsoft.AspNetCore.Mvc.Testing package. Use of this package streamlines test creation and execution.
+>
+> The Microsoft.AspNetCore.Mvc.Testing package handles the following tasks:
+> - Copies the dependencies file (.deps) from the SUT into the test project's bin directory.
+> - Sets the content root to the SUT's project root so that static files and pages/views are found when the tests are executed.
+> - Provides the WebApplicationFactory class to streamline bootstrapping the SUT with TestServer.
+>
+> The unit tests documentation describes how to set up a test project and test runner, along with detailed instructions on how to run tests and recommendations for how to name tests and test classes.
+
+</details>
+
+So, basically, the biggest advantage of the mentioned test framework that it provides the full access to test server and the SUT using WebApplicationFactory. During the testing session we still use the same application but we have access to its dependency container and with help of [test doubles](https://martinfowler.com/bliki/TestDouble.html) ([see more](https://learn.microsoft.com/en-us/ef/ef6/fundamentals/testing/writing-test-doubles)) we can easily isolate our SUT from any external dependency, [like DB](https://learn.microsoft.com/en-us/ef/core/testing/), what makes our integration test a unit test from previous chapter, right?
+And tha's the core place of the whole [chosen testing strategy](https://martinfowler.com/articles/microservice-testing/).
 
 ### Supported configurations
+
+Factually, at this moment we have the following environments where our SUT can be deployed:
+- Development - local environment used during development of increment of functionality. It requires to setup all (or a part of) external dependencies at a local machine. Usually, development setup means that only database hosted in the local instance of MS SQL Server; all the rest is reused from another environment like integration or staging, because such dependencies are resource demanding.
+- Production - planned environment, not in use to date.
+Our SUT uses standard `appsettings.json` approach to handle different environment configurations. See docs here: [Configuration in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-7.0#appsettingsjson). To process it both SUT and tests can use [Options pattern in ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/configuration/options?view=aspnetcore-7.0). Here you can find more info about how it can be used and get familiar with main concepts, tactics, etc: [Feature Toggles (aka Feature Flags)](https://martinfowler.com/articles/feature-toggles.html).
+For the moment our integration tests could be run against two environments:
+- InMemory - completely isolated mode, no external dependencies are involved.
+- Development - local infrastructure is used, i.e. local DB.
 
 ```csharp TestEnvironments.cs
 ﻿namespace EPAM.StudyGroups.Tests.Integration.Extensions
@@ -1099,12 +1198,20 @@ Finally, I had to [introduce an option to run integration tests against real env
 
 ### Runsettings
 
+To switch current target environment I use `*.runsettings` files. See more info here: [Configure unit tests with a .runsettings file - Visual Studio (Windows)](https://learn.microsoft.com/en-us/visualstudio/test/configure-unit-tests-by-using-a-dot-runsettings-file?view=vs-2022).
+Using environment variables set up from `*.runsettings` files we can easily switch current target test environment. To do so, you need to go to TestExplorer → Options → Configure Run Settings.
+> [!NOTE]
+> If there is no Test Explorer window, you can open it from the main menu: TEST → Test Explorer.
+
+> [!NOTE]
+> If you do it the first time, than the list of runsettings files could be empty. In this case you need to select `Select Solution Wide runsettings File` and pick the needed one from the project root folder `.\EPAM.StudyGroups.Tests.Integration\`.
+
 ```xml InMemory.runsettings
 ﻿<RunSettings>
   <RunConfiguration>
     <EnvironmentVariables>
       <!-- List of environment variables we want to set-->
-	  <ASPNETCORE_ENVIRONMENT>Development</ASPNETCORE_ENVIRONMENT>
+      <ASPNETCORE_ENVIRONMENT>Development</ASPNETCORE_ENVIRONMENT>
       <TEST_ENVIRONMENT>InMemory</TEST_ENVIRONMENT>
     </EnvironmentVariables>
   </RunConfiguration>
@@ -1116,15 +1223,17 @@ Finally, I had to [introduce an option to run integration tests against real env
   <RunConfiguration>
     <EnvironmentVariables>
       <!-- List of environment variables we want to set-->
-	  <ASPNETCORE_ENVIRONMENT>Development</ASPNETCORE_ENVIRONMENT>
+      <ASPNETCORE_ENVIRONMENT>Development</ASPNETCORE_ENVIRONMENT>
       <TEST_ENVIRONMENT>Development</TEST_ENVIRONMENT>
     </EnvironmentVariables>
   </RunConfiguration>
   <NUnit>
-	<NumberOfTestWorkers>1</NumberOfTestWorkers>
+    <NumberOfTestWorkers>1</NumberOfTestWorkers>
   </NUnit>
 </RunSettings>
 ```
+> [!NOTE]
+> If there is no runsettings file selected and there is no pre-set environment variable using any other approach tests should be executed against InMemory env - completely isolated mode.
 
 ### Decorator for StudyGroupClient
 
@@ -1237,9 +1346,21 @@ namespace EPAM.StudyGroups.Tests.Integration
 
 </details>
 
-### Factories for different environments
+### Handling different environments
 
-```csharp
+But how to handle different real and non-real environments with the same tests?
+When I need to get access to an object from the infrastructure I use factory methods which return correct object/handler to SUT at target environment. There is a good explanation of the pattern: [Factory Method](https://refactoring.guru/design-patterns/factory-method). Below I placed an example of such approach which you can find in `EPAM.StudyGroups.Tests.Integration\Controllers\BaseControllerTests.cs`.
+
+The first one (`GetClient`) relates to a client to `StudyGroups` webservice. When I select `InMemory` mode, it will create a test server hosted in memory and then an http client to it which I can reuse further in my tests. When I select `Development` it will just create an http client to remote webserver according to base address set using `launchsettings.json` file.
+
+A similar approach I use to work with DAL. When I select `InMemory` mode, it will return my mock for db repository/DBContext, in any other case it will create a real repository/DbContext to access database hosted in MS SQL Server.
+> [!NOTE]
+> This book perfectly describes different factory patterns: [Design Patterns: Elements of Reusable Object-Oriented Software](https://www.oreilly.com/library/view/design-patterns-elements/0201633612/). Yes, it’s GoF.
+
+<details>
+<summary>StudyGroupPersistenceClient.cs</summary>
+
+```csharp BaseControllerTests.cs
 namespace EPAM.StudyGroups.Tests.Integration.Controllers
 {
     public class BaseControllerTests
@@ -1324,6 +1445,8 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
     }
 }
 ```
+
+</details>
 
 ## BDD, ATDD and fun-driven-development
 
