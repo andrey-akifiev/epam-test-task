@@ -1,6 +1,63 @@
 # epam-test-task
 
-## Intro
+## Intro or \[TL;DR\]
+
+I wanted to write this Read.me as a guide to my commits, showing step-by-step implementation and evolution of the final solution.
+So, factually, below you can find my comments to pushed commits, they include links to original commits. Also there are some thoughts about taken decisions and the reasons why I made them. Sometimes, I refer to external sources like official documentation by Microsoft, articles or books.
+
+Here is the list of tasks in the same order they appear in [PDF file](https://github.com/andrey-akifiev/epam-test-task/blob/main/Test%20task.pdf):
+- [List of different test cases](https://github.com/andrey-akifiev/epam-test-task/blob/main/README.md#bdd-atdd-and-fun-driven-development) (1a)
+- [Unit tests with different inputs](https://github.com/andrey-akifiev/epam-test-task#acceptance-criteria-implementation) (1b)
+- [Define testing level](https://github.com/andrey-akifiev/epam-test-task#acceptance-criteria-implementation) (1c)
+- SQL query:
+ > Write a SQL query that will return "all the `StudyGroups` which have at least an user with `name` starting on `M` sorted by `creation date`" like "Miguel" or "Manuel".
+ ```sql
+ SELECT DISTINCT sg.[Name], sg.[StudyGroupId], sg.[Subject], sg.[CreateDate]
+   FROM [StudyGroups].[dbo].[StudyGroups] as sg
+   JOIN [StudyGroups].[dbo].[UsersStudyGroups] as usg
+     ON sg.StudyGroupId = usg.StudyGroupsStudyGroupId
+  WHERE usg.[UsersId] IN (SELECT u.Id
+                          FROM [StudyGroups].[dbo].[Users] as u
+			  WHERE LOWER(u.FirstName) LIKE 'm%')
+ ORDER BY sg.[CreateDate] 
+ ```
+
+### Modern agile testing
+
+In most cases, modern software development is based on one of the agile methodologies such as SCRUM or Kanban. In addition to the framework, there are well-established workflow practices that are considered best practices, such as the organization of the Sprint Board, which, by the way, do not fundamentally differ depending on the chosen framework. The main task of such a board is to visualize the progress in developing a functionality increment. If we simplify this scheme, we get the following sequence:
+
+![2b51a1ec-b28a-47ca-9419-add84088dfd2](https://github.com/andrey-akifiev/epam-test-task/assets/142582676/4b2f85d1-ca98-44c0-adf9-0bf4c1cbd66f)
+
+Thus, during one sprint, each SBI goes through three main phases:
+
+1. **TODO** - task awaits to be taken in development.
+1. **IN PROGRESS** – development team is currently working on this task.
+1. **DONE** - task is ready to be shipped to the end-users.
+
+If we continue the discussion using the scheme defined above, it becomes obvious that testing is an integral part of development in the broadest sense. Using a variety of extreme programming practices, such as [Three Amigos](https://www.agilealliance.org/glossary/three-amigos/) and others, in the end we can even get the opportunity to simultaneously carry out programming and testing, which can significantly reduce the development time for a functionality increment and improve the quality of the finished product due to the fact that controversial moments and corner cases are identified much sooner than with more classical approaches.
+
+The question arises when does product testing begin and end. The answer to which is surprisingly simple: testing begins with the development of requirements and ends with the end of support for the project. I will try to highlight the main stages of such a testing process and correlate them with the SCRUM framework used.
+1. **Evaluation and expansion of requirements.** The tester's task is to determine the allowable boundaries for using the functionality increment. Most corner cases are independent of implementation details because they are related to how the user interacts with the application. Thus, the majority of test cases used by testers are always negative scenarios, testing the product's response to incorrect user input or behavior. For such scenarios, there are no restrictions on the time or stage of development at which they can be developed and compiled. However, if they are added to the requirements before the task is taken on, the team can better estimate the amount of work required, as well as better plan possible architectural or tactical decisions. If the developer also takes care of the unit tests, then by the time he is ready to submit an increment of functionality for acceptance testing, we will be sure that most of the test cases have already been executed, covered by automated testing. Refinement of requirements can be done through ceremonies called Grooming, Triage, Refinement, etc.
+
+1. **Testing First or TDD.** It's easy enough to start developing a new increment of functionality by writing tests if the requirements are detailed enough. At this stage, testers can help develop more test scenarios using various techniques such as Brainstorming. Further, using decomposition techniques, test scenarios can be distributed over the test pyramid in order to implement as many test scenarios as possible at the lowest level of testing. Due to this, most of the negative scenarios can be implemented as unit tests and guide the programmer during the development of incremental functionality. Positive scenarios can be implemented at higher levels, because they often require integration between different parts of the product.
+  ![image](https://github.com/andrey-akifiev/epam-test-task/assets/142582676/1223f841-8983-4b5a-8299-44cd5cc483b5)
+
+1. **Exploratory and acceptance testing.** After the end of the active development phase, acceptance testing should be performed. Technically, given the implementation of most of the test scenarios at lower levels, in particular those directly related to the acceptance criteria, we have enough time to conduct exploratory testing. This allows us to identify new unexpected test cases that have little to do with the domain area, requirements, but rather have to do with implementation details. After passing through this stage, the functionality increment is considered ready for delivery.
+
+1. **Regression testing.** It is performed in order to make sure that a new increment of functionality does not break existing functionality. Within CI/CD processes, every opportunity should be used to perform automated testing. A limited set of human tests can be run before a new increment is shipped.
+  ![image](https://github.com/andrey-akifiev/epam-test-task/assets/142582676/c8892432-77ff-4011-a475-b983c3cd372a)
+
+Thus, my goals as a tester should be:
+
+1. Increase the participation of testers at the stages of planning, analysis and design
+1. Identification of test cases
+1. Distribution of test scenarios over the test pyramid using decomposition
+1. Implementation of real test scenarios as low-level automated tests
+1. Release of working time for Exploratory testing.
+
+When a defect appears, it is extremely important to minimize the search area for its cause. This can be achieved by isolating individual system components. This practice is also very useful during the development of a new increment of functionality, since components usually use a fairly structured API when interacting. It is very much like a contract, an agreement between two components, the violation of which will result in the inoperability of one or more of them. Having such a contract allows you to build expectations about the behavior of dependencies. These expectations are used to isolate the component using various techniques. I replace the real dependency with an artificial object that respects the same contract, but I have full control over it, I can simulate both correct and incorrect behavior in order to refine the behavior of our own component and improve its quality.
+
+**So the plan is to write small, very fast tests on the lowest level it's possible with 100% functional coverage.**
 
 ## Restoring the app
 Basically initial commit is [Copied and restored code from pdf](https://github.com/andrey-akifiev/epam-test-task/commit/849a9ced44ba2c23c5b605ad8d2bbbf26bad98fb). 
@@ -1360,7 +1417,7 @@ A similar approach I use to work with DAL. When I select `InMemory` mode, it wil
 > This book perfectly describes different factory patterns: [Design Patterns: Elements of Reusable Object-Oriented Software](https://www.oreilly.com/library/view/design-patterns-elements/0201633612/). Yes, it’s GoF.
 
 <details>
-<summary>StudyGroupPersistenceClient.cs</summary>
+<summary>BaseControllerTests.cs</summary>
 
 ```csharp BaseControllerTests.cs
 namespace EPAM.StudyGroups.Tests.Integration.Controllers
@@ -1451,6 +1508,10 @@ namespace EPAM.StudyGroups.Tests.Integration.Controllers
 </details>
 
 ## BDD, ATDD and fun-driven-development
+
+**Disclaimer.** Just a few words about BDD usage. I usually avoid to use it for test automation. Despite project's PBIs pretend to follow this approach, unfortunately, quite often they have nothing related to it behind the scene. This is a good article about what’s wrong with test solutions based BDD: [Is BDD Automation Hurting Your Project?](https://saucelabs.com/blog/is-bdd-automation-actually-killing-your-project) If you ask me, how to build the right thing, I’d recommend to follow the [BDD in Action](https://www.oreilly.com/library/view/bdd-in-action/9781617291654/). There are only two options: to adopt everything or to waste time and money.
+
+Anyway, since Gherkin is used quite often, just for fun [I've implemented](https://github.com/andrey-akifiev/epam-test-task/commit/509145f66c94fb810081a3663bfef7fb10b2ceb7) the same tests using [Specflow](https://specflow.org/). And basically as a quite lazy person, I'd like to reuse them as my specification of test scenarios.
 
 ```gherkin
 Feature: StudyGroup
@@ -1575,7 +1636,8 @@ Scenario: User should be able to re-join the study group
      And the list of study groups 'contains new group'
      And the 'new' study group contains 'new' user
 ```
-
+Under the cut below you can find implementation of step definitions for steps used in this tests. It's a simple and straightforward solution with several hooks (`BeforeScenario` and `AfterScenario` to clean the test data after each test) and passing data from one step to another using `ScenarioContext`. To decrease number of steps and increase their reusability I've used the classical approach with parametherization and switch-case blocks.
+I just want to pay attention that here I reuse the same code from `Tests.Integration` what proves it's possible to reuse the same test code for e2e tests as well.
 
 <details>
 <summary>StudyGroupStepDefinitions.cs</summary>
@@ -1976,6 +2038,10 @@ namespace EPAM.StudyGroups.Tests.SpecFlow.StepDefinitions
 </details>
 
 ## NFR and Load/Performance testing
+
+Is it possible to reuse the same test code for something else, like NFR-testing? Yes, of cause.
+Usually engineers use JMeter/Gattling for load testing. In this case they have two different code bases which they have to support. But it's also possible to utilize the same C# code written for functional testing for non-functional using [NBomber](https://nbomber.com/).
+Since I don't have any data about NFR, performance metrics, etc, I've implemented just a PoC solution to demonstrate utilization of the code base.
 
 ```csharp
 namespace EPAM.StudyGroups.Tests.Performance
