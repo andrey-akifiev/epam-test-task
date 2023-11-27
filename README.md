@@ -130,11 +130,10 @@ To use it you need to:
   dotnet tool install --global dotnet-ef
   ```
 - Install [extension](https://marketplace.visualstudio.com/items?itemName=MadsKristensen.CommandTaskRunner64) which will let you execute the needed scripts through VS 2022 UI using Task Runner Explorer. (Please check the link for troubleshooting if there is any issue)
- 
-```powershell RecreateDB.ps1
-dotnet ef database drop --project "EPAM.StudyGroups.Api.csproj"  --context StudyGroupsContext --force
-dotnet ef database update --project "EPAM.StudyGroups.Api.csproj"  --context StudyGroupsContext
-```
+  ```powershell RecreateDB.ps1
+  dotnet ef database drop --project "EPAM.StudyGroups.Api.csproj"  --context StudyGroupsContext --force
+  dotnet ef database update --project "EPAM.StudyGroups.Api.csproj"  --context StudyGroupsContext
+  ```
 
 #### commands.json
 Moreover, I added a `commands.json` file to be able to run the script with tow clicks from my Visual Studio. Check the gif out to know how to use it:

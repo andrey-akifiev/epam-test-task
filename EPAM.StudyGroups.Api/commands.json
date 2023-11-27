@@ -4,6 +4,11 @@
       "fileName": "powershell.exe",
       "workingDirectory": ".",
       "arguments": "-ExecutionPolicy Bypass -NonInteractive -File Scripts\\RecreateDB.ps1"
+    },
+    "RunInDocker": {
+      "fileName": "powershell.exe",
+      "workingDirectory": ".",
+      "arguments": "-ExecutionPolicy Bypass -NonInteractive -File Scripts\\RunInDocker.ps1"
     }
   }
 }

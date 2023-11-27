@@ -6,15 +6,16 @@ EXPOSE 80
 EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
-WORKDIR /src
-COPY ["EPAM.StudyGroups.Api.csproj", "."]
-RUN dotnet restore "./EPAM.StudyGroups.Api.csproj"
 COPY . .
-WORKDIR "/src/."
-RUN dotnet build "EPAM.StudyGroups.Api.csproj" -c Release -o /app/build
+RUN dotnet restore "./EPAM.StudyGroups.Api/EPAM.StudyGroups.Api.csproj"
+RUN dotnet build "./EPAM.StudyGroups.Api/EPAM.StudyGroups.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "EPAM.StudyGroups.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./EPAM.StudyGroups.Api/EPAM.StudyGroups.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+RUN dotnet tool install --version 6.0.13 -g dotnet-ef
+ENV PATH="${PATH}:/root/.dotnet/tools"
+RUN dotnet ef database update --project "./EPAM.StudyGroups.Api/EPAM.StudyGroups.Api.csproj"  --context StudyGroupsContext; 
 
 FROM base AS final
 WORKDIR /app
